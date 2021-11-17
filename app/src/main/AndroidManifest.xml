@@ -21,7 +21,7 @@
 
     <meta-data
             android:name="xposeddescription"
-            android:value="隐藏MIUI勇者标识"/>
+            android:value="隐藏MIUI勇者标识\nhttps://github.com/GSWXXN/HideDEVIcon"/>
     </application>
 
 
