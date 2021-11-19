@@ -6,9 +6,10 @@ import de.robv.android.xposed.XposedHelpers;
 public class DealWithMethod extends XC_MethodHook {
     private final Class<?> Utils;
 
-    public DealWithMethod(Class<?> Utils){
+    public DealWithMethod(Class<?> Utils) {
         this.Utils = Utils;
     }
+
     @Override
     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
         super.beforeHookedMethod(param);
@@ -19,6 +20,6 @@ public class DealWithMethod extends XC_MethodHook {
             k2 = g2;
         }
 
-        param.setResult(k2 + "℃");
+        param.setResult(String.valueOf(k2));
     }
 }
