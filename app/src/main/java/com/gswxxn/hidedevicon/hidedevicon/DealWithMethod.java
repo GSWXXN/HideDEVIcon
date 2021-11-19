@@ -5,7 +5,6 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class DealWithMethod extends XC_MethodHook {
     private final XC_LoadPackage.LoadPackageParam lpparam;
-    private SysInfo sysInfo;
 
     public DealWithMethod(XC_LoadPackage.LoadPackageParam lpparam) {
         this.lpparam = lpparam;
@@ -15,21 +14,11 @@ public class DealWithMethod extends XC_MethodHook {
     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
         super.beforeHookedMethod(param);
 
-        this.sysInfo = new SysInfo(lpparam, param);
+        SysInfo sysInfo = new SysInfo(lpparam, param);
 
         if (sysInfo.getModifiable()) {
             sysInfo.getIS_DEVELOPMENT_VERSION().setAccessible(true);
             sysInfo.getIS_DEVELOPMENT_VERSION().setBoolean(param.thisObject, false);
-        }
-    }
-
-    @Override
-    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-        super.afterHookedMethod(param);
-
-        if (sysInfo.getModifiable()) {
-            sysInfo.getIS_DEVELOPMENT_VERSION().setBoolean(param.thisObject, true);
-            sysInfo.getIS_DEVELOPMENT_VERSION().setAccessible(false);
         }
     }
 }
