@@ -44,7 +44,7 @@ public class DealWithView extends XC_MethodHook {
         valueView.setLayoutParams(valueParams);
 
         valueView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, (float) 36.399998);
-        valueView.setPadding(0, dp2px(context, (float) -3.25), 0, 0);
+        valueView.setPadding(0, dp2px(context, (float) -3.539978), 0, 0);
         valueView.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
         valueView.setGravity(Gravity.TOP | Gravity.START);
 
@@ -57,7 +57,7 @@ public class DealWithView extends XC_MethodHook {
         temperatureSign.setLayoutParams(textParams);
 
         temperatureSign.setTextSize(TypedValue.COMPLEX_UNIT_DIP, (float) 13.099977);
-        temperatureSign.setPadding(0, dp2px(context, 29), 0, 0);
+        temperatureSign.setPadding(0, dp2px(context, (float) 25.3999), 0, 0);
         temperatureSign.setText("℃");
         temperatureSign.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
         temperatureSign.setTextColor(Color.parseColor("#333333"));
