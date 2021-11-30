@@ -15,9 +15,12 @@ import java.lang.reflect.Field;
 
 public class DealWithView extends XC_MethodHook {
     private final Class<?> Powercenter$a;
+    private final String versionCode;
 
-    public DealWithView(Class<?> Powercenter$a) {
+
+    public DealWithView(Class<?> Powercenter$a, String versionCode) {
         this.Powercenter$a = Powercenter$a;
+        this.versionCode = versionCode;
     }
 
     public static int dp2px(Context context, float dpVal) {
@@ -28,8 +31,12 @@ public class DealWithView extends XC_MethodHook {
     @Override
     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
         super.afterHookedMethod(param);
-        int current_temperature_value = 0x7f0b026f;
-        int tempe_value_container = 0x7f0b093c;
+        ViewResources viewResources = new ViewResources(versionCode);
+        int current_temperature_value = viewResources.current_temperature_value;
+        int tempe_value_container = viewResources.tempe_value_container;
+        if (current_temperature_value== -1 || tempe_value_container == -1) {
+            return;
+        }
 
         Context context = AndroidAppHelper.currentApplication().getApplicationContext();
 
