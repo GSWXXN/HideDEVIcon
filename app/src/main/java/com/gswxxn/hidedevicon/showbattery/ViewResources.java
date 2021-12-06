@@ -7,31 +7,51 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class ViewResources {
-    public int current_temperature_value = -1;
-    public int tempe_value_container = -1;
+    public int currentTemperatureValue = -1;
+    public int tempeValueContainer = -1;
 
-    public ViewResources(String versionCode) {
+    public ViewResources(String versionName) {
         try {
-            InputStreamReader isr = new InputStreamReader(
-                    Objects.requireNonNull(
-                            this.getClass().getClassLoader()).getResourceAsStream("assets/view_config.json"));
-            BufferedReader bfr = new BufferedReader(isr);
-            String line;
-            StringBuilder stringBuilder = new StringBuilder();
-            while ((line = bfr.readLine()) != null) {
-                stringBuilder.append(line);
-            }
-            JSONObject root = new JSONObject(stringBuilder.toString());
-            String current_temperature_value = root.getJSONObject("current_temperature_value").getString(versionCode);
-            String tempe_value_container = root.getJSONObject("tempe_value_container").getString(versionCode);
+            StringBuilder stringBuilder = openJson();
+            Map<String, String> configMap = readJson(stringBuilder, versionName);
 
-            this.current_temperature_value = Integer.parseInt(current_temperature_value, 16);
-            this.tempe_value_container = Integer.parseInt(tempe_value_container, 16);
-        } catch (IOException e) {
+
+            this.currentTemperatureValue = Integer.parseInt(Objects.requireNonNull(configMap.get("currentTemperatureValue")), 16);
+            this.tempeValueContainer = Integer.parseInt(Objects.requireNonNull(configMap.get("tempeValueContainer")), 16);
+        } catch (IOException | JSONException e) {
             XposedBridge.log(e);
-        } catch (JSONException ignored) {}
+        }
+    }
+
+    public StringBuilder openJson() throws IOException {
+        InputStreamReader isr = new InputStreamReader(
+                Objects.requireNonNull(
+                        this.getClass().getClassLoader()).getResourceAsStream("assets/view_config.json"));
+        BufferedReader bfr = new BufferedReader(isr);
+        String line;
+        StringBuilder stringBuilder = new StringBuilder();
+        while ((line = bfr.readLine()) != null) {
+            stringBuilder.append(line);
+        }
+        return stringBuilder;
+    }
+
+    public Map<String, String> readJson(StringBuilder stringBuilder, String versionName) throws JSONException {
+        Map<String, String> map = new HashMap<>();
+        JSONObject root = new JSONObject(stringBuilder.toString());
+        try{
+            map.put("currentTemperatureValue", root.getJSONObject("current_temperature_value").getString(versionName));
+            map.put("tempeValueContainer", root.getJSONObject("tempe_value_container").getString(versionName));
+        }catch (JSONException e) {
+            String defaultVersion = root.getString("default");
+            map.put("currentTemperatureValue", root.getJSONObject("current_temperature_value").getString(defaultVersion));
+            map.put("tempeValueContainer", root.getJSONObject("tempe_value_container").getString(defaultVersion));
+        }
+        return map;
     }
 }

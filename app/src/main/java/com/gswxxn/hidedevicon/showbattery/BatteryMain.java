@@ -1,7 +1,6 @@
 package com.gswxxn.hidedevicon.showbattery;
 
 import android.content.Context;
-import android.os.Build;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
@@ -12,33 +11,28 @@ public class BatteryMain {
 
     public static void hook(XC_LoadPackage.LoadPackageParam lpparam) {
         // Return Battery Value instead of description
-        Class<?> Powercenter = XposedHelpers.findClass("com.miui.powercenter.a", lpparam.classLoader);
-        Class<?> Utils = XposedHelpers.findClass("com.miui.powercenter.utils.q", lpparam.classLoader);
-        XposedHelpers.findAndHookMethod(Powercenter, "b", Context.class, new DealWithMethod(Utils));
+        Class<?> powerCenter = XposedHelpers.findClass("com.miui.powercenter.a", lpparam.classLoader);
+        Class<?> utils = XposedHelpers.findClass("com.miui.powercenter.utils.q", lpparam.classLoader);
+        XposedHelpers.findAndHookMethod(powerCenter, "b", Context.class, new DealWithMethod(utils));
 
         // Modify View
-        Class<?> Powercenter$a = XposedHelpers.findClass("com.miui.powercenter.a$a", lpparam.classLoader);
-        XposedHelpers.findAndHookMethod(Powercenter$a, "run",
-                new DealWithView(Powercenter$a, String.valueOf(getPackageVersion(lpparam))));
+        Class<?> powerCenterA = XposedHelpers.findClass("com.miui.powercenter.a$a", lpparam.classLoader);
+        XposedHelpers.findAndHookMethod(powerCenterA, "run",
+                new DealWithView(powerCenterA, String.valueOf(getPackageVersionName(lpparam))));
     }
 
-    public static int getPackageVersion(XC_LoadPackage.LoadPackageParam lpparam) {
+    public static String getPackageVersionName(XC_LoadPackage.LoadPackageParam lpparam) {
         try {
             File apkPath = new File(lpparam.appInfo.sourceDir);
-            int versionCode;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                Class<?> pkgParserClass = XposedHelpers.findClass("android.content.pm.PackageParser", lpparam.classLoader);
-                Object packageLite = XposedHelpers.callStaticMethod(pkgParserClass, "parsePackageLite", apkPath, 0);
-                versionCode = XposedHelpers.getIntField(packageLite, "versionCode");
-            } else {
-                Class<?> parserCls = XposedHelpers.findClass("android.content.pm.PackageParser", lpparam.classLoader);
-                Object pkg = XposedHelpers.callMethod(parserCls.newInstance(), "parsePackage", apkPath, 0);
-                versionCode = XposedHelpers.getIntField(pkg, "mVersionCode");
-            }
-            return versionCode;
+            String versionName;
+            Class<?> parserCls = XposedHelpers.findClass("android.content.pm.PackageParser", lpparam.classLoader);
+            Object pkg = XposedHelpers.callMethod(parserCls.newInstance(), "parsePackage", apkPath, 0);
+            versionName = (String) XposedHelpers.getObjectField(pkg, "mVersionName");
+
+            return versionName;
         } catch (Throwable e) {
             XposedBridge.log(e);
         }
-        return -1;
+        return null;
     }
 }

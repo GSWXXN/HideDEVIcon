@@ -17,8 +17,8 @@ public class DealWithMethod extends XC_MethodHook {
         SysInfo sysInfo = new SysInfo(lpparam, param);
 
         if (sysInfo.getModifiable()) {
-            sysInfo.getIS_DEVELOPMENT_VERSION().setAccessible(true);
-            sysInfo.getIS_DEVELOPMENT_VERSION().setBoolean(param.thisObject, false);
+            sysInfo.getIsDevelopment().setAccessible(true);
+            sysInfo.getIsDevelopment().setBoolean(param.thisObject, false);
         }
     }
 }
