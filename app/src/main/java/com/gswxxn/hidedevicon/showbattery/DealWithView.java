@@ -3,6 +3,8 @@ package com.gswxxn.hidedevicon.showbattery;
 import android.annotation.SuppressLint;
 import android.app.AndroidAppHelper;
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -10,17 +12,15 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XposedBridge;
 
 import java.lang.reflect.Field;
 
 public class DealWithView extends XC_MethodHook {
     private final Class<?> powerCenterA;
-    private final String versionCode;
 
-
-    public DealWithView(Class<?> powerCenterA, String versionCode) {
+    public DealWithView(Class<?> powerCenterA) {
         this.powerCenterA = powerCenterA;
-        this.versionCode = versionCode;
     }
 
     public static int dp2px(Context context, float dpVal) {
@@ -28,17 +28,31 @@ public class DealWithView extends XC_MethodHook {
                 dpVal, context.getResources().getDisplayMetrics());
     }
 
+    public static String getPackageVersionName(Context context) {
+        String versionName = null;
+        PackageManager pm = context.getPackageManager();
+        try {
+            PackageInfo info = pm.getPackageInfo(context.getPackageName(), 0);
+            versionName = info.versionName;
+
+        }catch (PackageManager.NameNotFoundException e) {
+            XposedBridge.log(e);
+        }
+        return versionName;
+    }
+
     @Override
     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
         super.afterHookedMethod(param);
-        ViewResources viewResources = new ViewResources(versionCode);
+        Context context = AndroidAppHelper.currentApplication().getApplicationContext();
+
+        ViewResources viewResources = new ViewResources(getPackageVersionName(context));
+
         int currentTemperatureValue = viewResources.currentTemperatureValue;
         int tempeValueContainer = viewResources.tempeValueContainer;
         if (currentTemperatureValue== -1 || tempeValueContainer == -1) {
             return;
         }
-
-        Context context = AndroidAppHelper.currentApplication().getApplicationContext();
 
         Field field = powerCenterA.getDeclaredField("a");
         field.setAccessible(true);
