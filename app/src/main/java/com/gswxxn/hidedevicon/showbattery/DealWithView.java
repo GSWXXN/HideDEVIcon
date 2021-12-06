@@ -3,8 +3,7 @@ package com.gswxxn.hidedevicon.showbattery;
 import android.annotation.SuppressLint;
 import android.app.AndroidAppHelper;
 import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -12,7 +11,6 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedBridge;
 
 import java.lang.reflect.Field;
 
@@ -23,22 +21,14 @@ public class DealWithView extends XC_MethodHook {
         this.powerCenterA = powerCenterA;
     }
 
-    public static int dp2px(Context context, float dpVal) {
+    public int dp2px(Context context, float dpVal) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 dpVal, context.getResources().getDisplayMetrics());
     }
 
-    public static String getPackageVersionName(Context context) {
-        String versionName = null;
-        PackageManager pm = context.getPackageManager();
-        try {
-            PackageInfo info = pm.getPackageInfo(context.getPackageName(), 0);
-            versionName = info.versionName;
-
-        }catch (PackageManager.NameNotFoundException e) {
-            XposedBridge.log(e);
-        }
-        return versionName;
+    public int getResourceId(Context context, String name) {
+        Resources r = context.getResources();
+        return r.getIdentifier(name, "id", "com.miui.securitycenter");
     }
 
     @Override
@@ -46,11 +36,9 @@ public class DealWithView extends XC_MethodHook {
         super.afterHookedMethod(param);
         Context context = AndroidAppHelper.currentApplication().getApplicationContext();
 
-        ViewResources viewResources = new ViewResources(getPackageVersionName(context));
-
-        int currentTemperatureValue = viewResources.currentTemperatureValue;
-        int tempeValueContainer = viewResources.tempeValueContainer;
-        if (currentTemperatureValue== -1 || tempeValueContainer == -1) {
+        int currentTemperatureValue = getResourceId(context, "current_temperature_value");
+        int tempeValueContainer = getResourceId(context, "tempe_value_container");
+        if (currentTemperatureValue== 0 || tempeValueContainer == 0) {
             return;
         }
 
