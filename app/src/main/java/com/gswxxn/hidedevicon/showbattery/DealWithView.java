@@ -2,6 +2,7 @@ package com.gswxxn.hidedevicon.showbattery;
 
 import android.app.AndroidAppHelper;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -55,6 +56,7 @@ public class DealWithView extends XC_MethodHook {
     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
         super.afterHookedMethod(param);
         Context context = AndroidAppHelper.currentApplication().getApplicationContext();
+        boolean isDarkMode = (context.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
 
         int currentTemperatureValue = getResourceId(context, "current_temperature_value");
         int tempeValueContainer = getResourceId(context, "tempe_value_container");
@@ -77,7 +79,7 @@ public class DealWithView extends XC_MethodHook {
         valueView.setPadding(0, dp2px(context, (float) -3.539978), 0, 0);
         valueView.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
         valueView.setGravity(Gravity.TOP | Gravity.START);
-        valueView.setTextColor(Color.parseColor("#333333"));
+        valueView.setTextColor(Color.parseColor(isDarkMode ? "#e6e6e6" : "#333333"));
         valueView.setTypeface((Typeface) XposedHelpers.callStaticMethod(fonts, "a", context));
         valueView.setText(getTemperatureValue(utils, context));
 
@@ -93,7 +95,7 @@ public class DealWithView extends XC_MethodHook {
         temperatureSign.setText("℃");
         temperatureSign.setTypeface((Typeface) XposedHelpers.callStaticMethod(fonts, "a"), Typeface.BOLD);
         temperatureSign.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
-        temperatureSign.setTextColor(Color.parseColor("#333333"));
+        temperatureSign.setTextColor(Color.parseColor(isDarkMode ? "#e6e6e6" : "#333333"));
 
         // reset tempe_value_container
         LinearLayout linearLayout = view.findViewById(tempeValueContainer);
