@@ -19,12 +19,10 @@ import java.lang.reflect.Field;
 public class DealWithView extends XC_MethodHook {
     private final Class<?> powerCenterA;
     private final Class<?> utils;
-    private final Class<?> fonts;
 
-    public DealWithView(Class<?> powerCenterA, Class<?> utils, Class<?> fonts) {
+    public DealWithView(Class<?> powerCenterA, Class<?> utils) {
         this.powerCenterA = powerCenterA;
         this.utils = utils;
-        this.fonts = fonts;
     }
 
     public int dp2px(Context context, float dpVal) {
@@ -67,6 +65,7 @@ public class DealWithView extends XC_MethodHook {
         Field field = powerCenterA.getDeclaredField("a");
         field.setAccessible(true);
         View view = (View) field.get(param.thisObject);
+        Typeface typeface = (Typeface) XposedHelpers.callStaticMethod(Typeface.class, "create", "mipro", 0);
 
         // Set Temperature Value Attribute
         TextView valueView = view.findViewById(currentTemperatureValue);
@@ -80,7 +79,7 @@ public class DealWithView extends XC_MethodHook {
         valueView.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
         valueView.setGravity(Gravity.TOP | Gravity.START);
         valueView.setTextColor(Color.parseColor(isDarkMode ? "#e6e6e6" : "#333333"));
-        valueView.setTypeface((Typeface) XposedHelpers.callStaticMethod(fonts, "a", context));
+        valueView.setTypeface(typeface, Typeface.NORMAL);
         valueView.setText(getTemperatureValue(utils, context));
 
         // Set Temperature Sign Attribute
@@ -93,7 +92,7 @@ public class DealWithView extends XC_MethodHook {
         temperatureSign.setTextSize(TypedValue.COMPLEX_UNIT_DIP, (float) 13.099977);
         temperatureSign.setPadding(0, dp2px(context, (float) 25.3999), 0, 0);
         temperatureSign.setText("℃");
-        temperatureSign.setTypeface((Typeface) XposedHelpers.callStaticMethod(fonts, "a"), Typeface.BOLD);
+        temperatureSign.setTypeface(typeface, Typeface.BOLD);
         temperatureSign.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
         temperatureSign.setTextColor(Color.parseColor(isDarkMode ? "#e6e6e6" : "#333333"));
 
